@@ -52,7 +52,7 @@ class CNN(nn.Module if nn else object):
             nn.ReLU(),
             # 最大池化层：用2x2窗口把特征图长宽减半（28x28 ->14x14）
             nn.MaxPool2d(kernel_size=2),
-            # 第二层卷积：输入6个通道，输出32个特征图
+            # 第二层卷积：输入16个通道，输出32个特征图
             nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2),)
