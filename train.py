@@ -1,5 +1,6 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
+from captum.attr import IntegratedGradients
 from data_utils import load_mnist, prepare_for_cnn, prepare_for_fcnn
 from metrics import print_metrics
 
@@ -114,9 +115,8 @@ def train_cnn(x_train, y_train, x_test, y_test):
 
     print_metrics(y_test_tensor.numpy(), y_pred, y_prob)
     
-"""
-Captum 开始
-"""    
+
+    # Captum 开始
     # 生成一个 Captum 模型解释结果
     explain_cnn_with_captum(
         model=model,
@@ -191,9 +191,7 @@ def explain_cnn_with_captum(model, x_test_tensor, y_test_tensor, device,
 
     print(f"Captum explanation saved to: {save_path}")
     print(f"Convergence delta: {delta.item():.6f}")
-"""
-Captum 结束
-"""
+    # Captum 结束
 
 def main():
     np.random.seed(RANDOM_SEED)
