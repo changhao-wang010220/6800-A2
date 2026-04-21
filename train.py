@@ -113,8 +113,87 @@ def train_cnn(x_train, y_train, x_test, y_test):
     y_pred = torch.cat(all_preds, dim=0).numpy()
 
     print_metrics(y_test_tensor.numpy(), y_pred, y_prob)
+    
+"""
+Captum 开始
+"""    
+    # 生成一个 Captum 模型解释结果
+    explain_cnn_with_captum(
+        model=model,
+        x_test_tensor=x_test_tensor,
+        y_test_tensor=y_test_tensor,
+        device=device,
+        sample_index=0,
+        save_path="captum_mnist_explanation.png")
 
+def explain_cnn_with_captum(model, x_test_tensor, y_test_tensor, device,
+                            sample_index=0,
+                            save_path="captum_mnist_explanation.png"):
+    """
+    使用 Captum 的 Integrated Gradients 对 CNN 的单个测试样本进行解释，
+    并保存解释图像。
+    """
+    import torch
 
+    model.eval()
+
+    # 取一个测试样本
+    input_image = x_test_tensor[sample_index:sample_index + 1].to(device)
+    true_label = int(y_test_tensor[sample_index].item())
+
+    # 前向预测
+    input_image.requires_grad_()
+    outputs = model(input_image)
+    pred_label = int(outputs.argmax(dim=1).item())
+
+    # 定义 Captum 解释器
+    ig = IntegratedGradients(model)
+
+    baseline = torch.zeros_like(input_image)
+
+    # 针对预测类别做归因
+    attributions, delta = ig.attribute(
+        input_image,
+        baselines=baseline,
+        target=pred_label,
+        return_convergence_delta=True
+    )
+
+    image_np = input_image.detach().cpu().squeeze().numpy()
+    attr_np = attributions.detach().cpu().squeeze().numpy()
+
+    # 为了可视化，取绝对值并归一化
+    attr_vis = np.abs(attr_np)
+    attr_vis = attr_vis / (attr_vis.max() + 1e-8)
+
+    # 绘图
+    plt.figure(figsize=(10, 3))
+
+    plt.subplot(1, 3, 1)
+    plt.imshow(image_np, cmap="gray")
+    plt.title(f"Original\nTrue={true_label}, Pred={pred_label}")
+    plt.axis("off")
+
+    plt.subplot(1, 3, 2)
+    plt.imshow(attr_np, cmap="seismic")
+    plt.title("IG Attribution")
+    plt.axis("off")
+
+    plt.subplot(1, 3, 3)
+    plt.imshow(image_np, cmap="gray")
+    plt.imshow(attr_vis, cmap="hot", alpha=0.5)
+    plt.title("Overlay")
+    plt.axis("off")
+
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+    plt.show()
+
+    print(f"Captum explanation saved to: {save_path}")
+    print(f"Convergence delta: {delta.item():.6f}")
+"""
+Captum 结束
+"""
 
 def main():
     np.random.seed(RANDOM_SEED)
