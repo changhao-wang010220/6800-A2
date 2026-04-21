@@ -189,7 +189,7 @@ def explain_cnn_with_captum(model, x_test_tensor, y_test_tensor, device,
     plt.savefig(save_path, dpi=300, bbox_inches="tight")
     plt.show()
 
-    print(f"Captum explanation saved to: {save_path}")
+    print(f"Captum 解释图已保存至: {save_path}")
     print(f"Convergence delta: {delta.item():.6f}")
     # Captum 结束
 
