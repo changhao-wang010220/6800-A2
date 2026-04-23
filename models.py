@@ -8,11 +8,12 @@ class FullyConnectedNet(nn.Module if nn else object):
     """
     模型: 全连接神经网络，用于 MNIST 手写数字分类
 
-    输入资料形状: (MNIST 每张图是 28 × 28，摊平成一维变成 28 × 28 = 784 个数字)
-        (batch_size, 784)
+    输入形状: (batch_size, 784)
+    MNIST 每张图是 28 × 28，摊平成一维变成 28 × 28 = 784 个数字
+        
 
-    输出资料形状: (数字分成 0~9 共 10 类，所以模型最后会输出 10 个值，分别代表每一类的分数)
-        (batch_size, 10)
+    输出形状: (batch_size, 10)
+    数字分成 0~9 共 10 类，所以模型最后会输出 10 个值，分别代表每一类的分数
     """
 
     def __init__(self):
