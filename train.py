@@ -52,21 +52,20 @@ def train_fully_connected_network(x_train, y_train, x_test, y_test):
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
-    # 选择运算装置：有 GPU 就用 GPU，没有就用 CPU
+    # 选择运算装置
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # 建立模型并移动到 device
+    # 建立模型
     model = FullyConnectedNet().to(device)
 
-    # 多分类任务常用交叉熵损失
+    # 用交叉熵来算模型预测错多少
     criterion = nn.CrossEntropyLoss()
 
-    # Adam 优化器
+    # 使用 Adam 优化器来更新模型参数
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
-    # =============================
+
     # 模型训练
-    # =============================
     for epoch in range(EPOCHS):
         model.train()
 
@@ -78,19 +77,19 @@ def train_fully_connected_network(x_train, y_train, x_test, y_test):
             batch_images = batch_images.to(device)
             batch_labels = batch_labels.to(device)
 
-            # 每次更新前先把梯度清空
+            # 先把上一轮累积的梯度清掉，避免影响这一轮训练
             optimizer.zero_grad()
 
-            # 前向传播
+            # 把资料丢进模型，算出预测结果
             outputs = model(batch_images)
 
             # 计算 loss
             loss = criterion(outputs, batch_labels)
 
-            # 反向传播
+            # 根据 loss 往回算梯度，让模型知道要怎么调整参数
             loss.backward()
 
-            # 更新参数
+            # 用刚刚算出来的梯度来更新模型参数
             optimizer.step()
 
             # 统计这一轮的 loss 和 accuracy
@@ -104,9 +103,7 @@ def train_fully_connected_network(x_train, y_train, x_test, y_test):
 
         print(f"Epoch {epoch + 1:02d}/{EPOCHS} - loss: {epoch_loss:.4f} - acc: {epoch_acc:.4f}")
 
-    # =============================
     # 模型测试
-    # =============================
     model.eval()
 
     all_probs = []
@@ -127,7 +124,7 @@ def train_fully_connected_network(x_train, y_train, x_test, y_test):
             all_probs.append(probs.cpu())
             all_preds.append(preds.cpu())
 
-    # 拼接所有 batch 的结果
+    # 把每个 batch 的预测结果合併起来，变成完整测试集的结果
     y_prob = torch.cat(all_probs, dim=0).numpy()
     y_pred = torch.cat(all_preds, dim=0).numpy()
 

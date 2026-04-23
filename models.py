@@ -20,9 +20,8 @@ class FullyConnectedNet(nn.Module if nn else object):
             raise ImportError("Install torch before implementing the model.")
         super().__init__()
 
-        # =============================
         # 网络结构设计
-        # =============================
+
         # 层数变化：784 → 256 → 128 → 10
         # 输入有 784 个特徵
         # 第一层有 256 个神经元
